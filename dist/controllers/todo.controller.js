@@ -1,36 +1,10 @@
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
-import { CreateTodoSchema, TodoSchema, TodoListSchema } from '../schemas/todo.schema.js';
+import { CreateTodoSchema, UpdateTodoSchema, TodoResponseSchema, } from '../schemas/todo.schema.js';
 import { todoService } from '../services/todo.service.js';
+import { authMiddleware } from '../middlewares/auth.middleware.js';
 export const todoController = new OpenAPIHono();
-const listRoute = createRoute({
-    method: 'get',
-    path: '/',
-    tags: ['Todos'],
-    summary: 'List all todos',
-    responses: {
-        200: {
-            description: 'List of todos',
-            content: { 'application/json': { schema: TodoListSchema } },
-        },
-    },
-});
-const getRoute = createRoute({
-    method: 'get',
-    path: '/{id}',
-    tags: ['Todos'],
-    summary: 'Get a todo by ID',
-    request: {
-        params: z.object({ id: z.string() }),
-    },
-    responses: {
-        200: {
-            description: 'Todo found',
-            content: { 'application/json': { schema: TodoSchema } },
-        },
-        404: { description: 'Todo not found' },
-    },
-});
-const createTodoRoute = createRoute({
+todoController.use('/*', authMiddleware);
+todoController.openapi(createRoute({
     method: 'post',
     path: '/',
     tags: ['Todos'],
@@ -43,20 +17,62 @@ const createTodoRoute = createRoute({
     responses: {
         201: {
             description: 'Todo created',
-            content: { 'application/json': { schema: TodoSchema } },
+            content: { 'application/json': { schema: TodoResponseSchema } },
         },
         400: { description: 'Invalid input' },
+        401: { description: 'Unauthorized' },
     },
-});
-todoController.openapi(listRoute, (c) => {
-    return c.json(todoService.getAll(), 200);
-});
-todoController.openapi(getRoute, (c) => {
-    const todo = todoService.getById(c.req.valid('param').id);
-    return c.json(todo, 200);
-});
-todoController.openapi(createTodoRoute, (c) => {
+}), async (c) => {
     const input = c.req.valid('json');
-    const todo = todoService.create(input);
-    return c.json(todo, 201);
+    const user = c.get('user');
+    const result = await todoService.create(input, user.id);
+    return c.json(result, 201);
+});
+todoController.openapi(createRoute({
+    method: 'patch',
+    path: '/{id}',
+    tags: ['Todos'],
+    summary: 'Update a todo',
+    request: {
+        params: z.object({ id: z.string().uuid() }),
+        body: {
+            content: { 'application/json': { schema: UpdateTodoSchema } },
+        },
+    },
+    responses: {
+        200: {
+            description: 'Todo updated',
+            content: { 'application/json': { schema: TodoResponseSchema } },
+        },
+        401: { description: 'Unauthorized' },
+        404: { description: 'Todo not found' },
+    },
+}), async (c) => {
+    const { id } = c.req.valid('param');
+    const input = c.req.valid('json');
+    const user = c.get('user');
+    const result = await todoService.update(id, input, user.id);
+    return c.json(result, 200);
+});
+todoController.openapi(createRoute({
+    method: 'delete',
+    path: '/{id}',
+    tags: ['Todos'],
+    summary: 'Delete a todo',
+    request: {
+        params: z.object({ id: z.string().uuid() }),
+    },
+    responses: {
+        200: {
+            description: 'Todo deleted',
+            content: { 'application/json': { schema: TodoResponseSchema } },
+        },
+        401: { description: 'Unauthorized' },
+        404: { description: 'Todo not found' },
+    },
+}), async (c) => {
+    const { id } = c.req.valid('param');
+    const user = c.get('user');
+    const result = await todoService.delete(id, user.id);
+    return c.json(result, 200);
 });

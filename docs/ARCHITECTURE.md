@@ -41,7 +41,6 @@ src/
 │   │   ├── verifications.ts    # verifications table (Better Auth)
 │   │   └── todos.ts            # todos table
 │   └── migrations/             # Generated + custom SQL migrations
-└── core/                       # Shared utilities
 ```
 
 ## Layers

@@ -1,10 +1,12 @@
 import { and, eq, sql } from 'drizzle-orm'
 import { db } from '../db/index.js'
 import { todos } from '../db/schema.js'
-import { NotFoundError } from '../exceptions/http-exceptions.js'
+import { BadRequestError, NotFoundError } from '../exceptions/http-exceptions.js'
 import type { CreateTodoInput, UpdateTodoInput } from '../schemas/todo.schema.js'
 
-const getTxId = async (tx: typeof db) => {
+type DbTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
+
+const getTxId = async (tx: DbTransaction) => {
   const result = await tx.execute<{ txid: number }>(
     sql`SELECT pg_current_xact_id()::xid::text::int as txid`,
   )
@@ -18,12 +20,16 @@ export const todoService = {
         .insert(todos)
         .values({ id: data.id, title: data.title, completed: false, ownerId: userId })
         .returning()
-      const txid = await getTxId(tx as unknown as typeof db)
+      const txid = await getTxId(tx)
       return { todo, txid }
     })
   },
 
   async update(id: string, data: UpdateTodoInput, userId: string) {
+    if (Object.keys(data).length === 0) {
+      throw new BadRequestError('At least one field must be provided')
+    }
+
     return db.transaction(async (tx) => {
       const existing = await tx
         .select({ id: todos.id })
@@ -40,7 +46,7 @@ export const todoService = {
         .set(data)
         .where(eq(todos.id, id))
         .returning()
-      const txid = await getTxId(tx as unknown as typeof db)
+      const txid = await getTxId(tx)
       return { todo, txid }
     })
   },
@@ -61,7 +67,7 @@ export const todoService = {
         .delete(todos)
         .where(eq(todos.id, id))
         .returning()
-      const txid = await getTxId(tx as unknown as typeof db)
+      const txid = await getTxId(tx)
       return { todo, txid }
     })
   },
