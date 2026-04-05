@@ -8,14 +8,23 @@ Hono web server starter project running on Node.js via `@hono/node-server`. Type
 
 ## Specs & Plans
 
-- [`docs/OVERVIEW.md`](../docs/OVERVIEW.md) – **What** This project is and why it exists.
-- [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md) – **How** it is structured (packages, layers, data flow).
+- [`docs/OVERVIEW.md`](../docs/OVERVIEW.md) – **What** this project is and why it exists.
+- [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md) – **How** it is structured (layers, data flow, adding new resources). **Read this before implementing any new feature.**
 - [`docs/plan/*`](../docs/plan/) – The **phase-by-phase implementation plan** you must follow. Follow name convention XX-some-plan-name.md (example: 03-electric-cloud.md)
 - [`docs/spec/*`](../docs/spec/) – The **phase-by-phase implementation spec** you must follow. Follow name convention XX-some-spec-name.md (example: 03-electric-cloud.md)
 - Every spec must have a matching plan with the same name
 - Both must include a `**Date:** YYYY-MM-DD` field after the title
 - Make plans in phases (numbered list)
 - At the end of each plan, give me a numbered list of unresolved questions to answer, if any. Make a question extremely concise, sacrificing grammar for the sake of concision.
+
+## Architecture (quick reference)
+
+New features must follow the **Controller → Service → Schema** layered pattern defined in `docs/ARCHITECTURE.md`:
+
+1. Schema (`src/schemas/`) — Zod validation + type inference (single source of truth)
+2. Service (`src/services/`) — business logic, no HTTP concerns, throws HTTPExceptions
+3. Controller (`src/controllers/`) — routes + validation via `zValidator`, delegates to service
+4. Mount controller in `src/app.ts` via `app.route()`
 
 ## Hono official documentation
 
