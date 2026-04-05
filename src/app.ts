@@ -1,12 +1,25 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { basicAuth } from 'hono/basic-auth'
+import { cors } from 'hono/cors'
 import { Scalar } from '@scalar/hono-api-reference'
 import { todoController } from './controllers/todo.controller.js'
+import { authController } from './controllers/auth.controller.js'
 
 const app = new OpenAPIHono()
 
+app.use(
+  '/api/*',
+  cors({
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
+    credentials: true,
+    allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Cookie', 'Authorization'],
+  }),
+)
+
 app.get('/api/v1/ping', (c) => c.text('pong'))
 
+app.route('/api/v1/auth', authController)
 app.route('/api/v1/todos', todoController)
 
 app.doc('/api/v1/openapi.json', {

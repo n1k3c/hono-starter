@@ -1,14 +1,39 @@
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
+    restart: unless-stopped
     ports:
-      - '5432:5432'
+      - '54320:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: hono_starter
+      POSTGRES_DB: tanstack_electric_starter
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    tmpfs:
+      - /tmp
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d tanstack_electric_starter']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command:
+      - -c
+      - listen_addresses=*
+      - -c
+      - wal_level=logical
+
+  electric:
+    image: docker.io/electricsql/electric:latest
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/tanstack_electric_starter?sslmode=disable
+      # Not suitable for production. Only use insecure mode in local development.
+      ELECTRIC_INSECURE: true
+    ports:
+      - '4000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
-  pgdata:
+  postgres_data:
