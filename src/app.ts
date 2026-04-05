@@ -29,22 +29,25 @@ app.doc('/api/v1/openapi.json', {
     version: '1.0.0',
     description: 'A TODO API built with Hono',
   },
-  tags: [{ name: 'Todos', description: 'Todo management' }],
+  tags: [
+    { name: 'Auth', description: 'Authentication' },
+    { name: 'Todos', description: 'Todo management' },
+  ],
 })
 
-const docsUsername = process.env.DOCS_USERNAME
-const docsPassword = process.env.DOCS_PASSWORD
-if (!docsUsername || !docsPassword) {
-  throw new Error('DOCS_USERNAME and DOCS_PASSWORD env vars are required')
-}
+// const docsUsername = process.env.DOCS_USERNAME
+// const docsPassword = process.env.DOCS_PASSWORD
+// if (!docsUsername || !docsPassword) {
+//   throw new Error('DOCS_USERNAME and DOCS_PASSWORD env vars are required')
+// }
 
-app.use(
-  '/api/v1/docs',
-  basicAuth({
-    username: docsUsername,
-    password: docsPassword,
-  }),
-)
+// app.use(
+//   '/api/v1/docs',
+//   basicAuth({
+//     username: docsUsername,
+//     password: docsPassword,
+//   }),
+// )
 
 app.get(
   '/api/v1/docs',

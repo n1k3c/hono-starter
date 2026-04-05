@@ -18,6 +18,7 @@ export const auth = betterAuth({
   advanced: {
     database: { generateId: false },
   },
+  basePath: '/api/v1/auth',
   emailAndPassword: {
     enabled: true,
   },

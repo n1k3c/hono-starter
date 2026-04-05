@@ -10,16 +10,8 @@ describe('GET /api/v1/ping', () => {
 })
 
 describe('GET /api/v1/docs', () => {
-  it('returns 401 without credentials', async () => {
+  it('returns 200', async () => {
     const res = await app.request('/api/v1/docs')
-    expect(res.status).toBe(401)
-  })
-
-  it('returns 200 with valid credentials', async () => {
-    const credentials = btoa('developer:pass12345')
-    const res = await app.request('/api/v1/docs', {
-      headers: { Authorization: `Basic ${credentials}` },
-    })
     expect(res.status).toBe(200)
   })
 })
