@@ -45,11 +45,29 @@ Official Hono documetnation: https://hono.dev/llms.txt
 
 ## Commands
 
-- **Dev server:** `pnpm dev` — runs `tsx watch src/index.ts` with hot reload on port 3000
+- **Dev server (local):** `pnpm dev` — loads `.env.local`, hot reload on port 3000
+- **Dev server (remote DB):** `pnpm dev:remote` — loads `.env.development`
 - **Build:** `pnpm build` — compiles TypeScript to `dist/`
-- **Start:** `pnpm start` — runs compiled `node dist/index.js`
+- **Start (production):** `pnpm start` — loads `.env.production`, runs `node dist/index.js`
 - **Run all tests:** `pnpm test` (vitest)
 - **Run a single test file:** `pnpm vitest run src/app.test.ts`
+- **DB start:** `pnpm db:up` — starts local PostgreSQL via Docker Compose
+- **DB stop:** `pnpm db:down` — stops local PostgreSQL
+- **DB generate migration:** `pnpm db:generate` — generates SQL from schema changes
+- **DB run migrations:** `pnpm db:migrate` — applies pending migrations
+- **DB studio:** `pnpm db:studio` — opens Drizzle Studio GUI
+
+## Environments
+
+Three environments configured via separate `.env` files:
+
+| Environment | Env File          | Database              |
+|-------------|-------------------|-----------------------|
+| Local       | `.env.local`      | Docker Compose PostgreSQL |
+| Development | `.env.development`| Hosted PostgreSQL     |
+| Production  | `.env.production` | Hosted PostgreSQL     |
+
+Template with all required keys: `.env.example` (committed to git).
 
 ## Tests
 

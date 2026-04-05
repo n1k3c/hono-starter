@@ -75,6 +75,10 @@ Shared utilities used across layers (logger, auth helpers, mailer, etc.).
 
 Database connection and Drizzle ORM setup.
 
+- `src/db/index.ts` — creates and exports the Drizzle `db` instance using `DATABASE_URL`
+- `src/db/schema.ts` — barrel file exporting all table schemas
+- `src/db/migrations/` — generated SQL migrations (via `pnpm db:generate`)
+
 ## Adding a New Resource
 
 1. Create `src/schemas/{resource}.schema.ts` — define Zod schemas and export types

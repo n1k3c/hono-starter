@@ -5,6 +5,7 @@ export default defineConfig({
     env: {
       DOCS_USERNAME: 'developer',
       DOCS_PASSWORD: 'pass12345',
+      DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/hono_starter_test',
     },
   },
 })
