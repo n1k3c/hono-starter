@@ -2,17 +2,44 @@
   "name": "hono-starter",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "dotenvx run --env-file .env.local -- tsx watch src/index.ts",
+    "dev:remote": "dotenvx run --env-file .env.development -- tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "dotenvx run --env-file .env.production -- node dist/index.js",
+    "test": "vitest run",
+    "dc:up": "docker compose up",
+    "dc:up:d": "docker compose up -d",
+    "dc:down": "docker compose down",
+    "dc:reset": "docker compose down -v && docker compose up -d",
+    "db:generate": "dotenvx run --env-file .env.local -- drizzle-kit generate --config=drizzle.config.ts",
+    "db:migrate": "dotenvx run --env-file .env.local -- drizzle-kit migrate --config=drizzle.config.ts",
+    "db:push": "dotenvx run --env-file .env.local -- drizzle-kit push --config=drizzle.config.ts",
+    "db:pull": "dotenvx run --env-file .env.local -- drizzle-kit pull --config=drizzle.config.ts",
+    "db:studio": "dotenvx run --env-file .env.local -- drizzle-kit studio --config=drizzle.config.ts",
+    "db:migrate:dev": "dotenvx run --env-file .env.development -- drizzle-kit migrate --config=drizzle.config.ts",
+    "db:migrate:prod": "dotenvx run --env-file .env.production -- drizzle-kit migrate --config=drizzle.config.ts",
+    "db:push:dev": "dotenvx run --env-file .env.development -- drizzle-kit push --config=drizzle.config.ts",
+    "db:push:prod": "dotenvx run --env-file .env.production -- drizzle-kit push --config=drizzle.config.ts",
+    "db:studio:dev": "dotenvx run --env-file .env.development -- drizzle-kit studio --config=drizzle.config.ts",
+    "db:studio:prod": "dotenvx run --env-file .env.production -- drizzle-kit studio --config=drizzle.config.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.12",
-    "hono": "^4.12.10"
+    "@hono/zod-openapi": "^1.2.4",
+    "@scalar/hono-api-reference": "^0.10.6",
+    "better-auth": "^1.5.6",
+    "drizzle-orm": "1.0.0-beta.20",
+    "hono": "^4.12.10",
+    "pg": "^8.20.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.60.0",
     "@types/node": "^20.11.17",
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "1.0.0-beta.20",
     "tsx": "^4.7.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.2"
   }
 }
